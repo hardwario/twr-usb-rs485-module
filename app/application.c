@@ -1,5 +1,4 @@
 #include <application.h>
-#include "bc_sc16is740.h"
 
 // LED instance
 bc_led_t led;
@@ -28,8 +27,6 @@ void module_rs485_event_handler(bc_module_rs485_event_t event, void *param)
 {
     (void) param;
 
-    //bc_log_debug("Event %d", event);
-
     if (event == BC_MODULE_RS485_EVENT_VOLTAGE)
     {
         float voltage;
@@ -49,6 +46,11 @@ void module_rs485_event_handler(bc_module_rs485_event_t event, void *param)
         size_t b = bc_module_rs485_async_read(rx_buffer, sizeof(rx_buffer));
 
         bc_log_dump(rx_buffer, b, "RX bytes %d", b);
+    }
+
+    if (event == BC_MODULE_RS485_EVENT_ASYNC_READ_TIMEOUT)
+    {
+        // Async receive timeout event
     }
 }
 
