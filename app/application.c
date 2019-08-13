@@ -18,6 +18,9 @@ void button_event_handler(bc_button_t *self, bc_button_event_t event, void *even
 {
     if (event == BC_BUTTON_EVENT_PRESS)
     {
+        uint8_t toggle_relay_0[] = {0x01, 0x06, 0x00, 0x01, 0x03, 0x00, 0xD8, 0xFA};
+        bc_module_rs485_async_write(toggle_relay_0, sizeof(toggle_relay_0));
+
         bc_led_set_mode(&led, BC_LED_MODE_TOGGLE);
         send_data();
     }
@@ -31,7 +34,11 @@ void module_rs485_event_handler(bc_module_rs485_event_t event, void *param)
     {
         float voltage;
         bc_module_rs485_get_voltage(&voltage);
-        bc_log_debug("Voltage %f", voltage);
+        bc_log_debug("%f", voltage);
+
+        char b[20];
+        snprintf(b, sizeof(b), "%f\n", voltage);
+        bc_uart_write(BC_UART_UART2, b, strlen(b));
     }
 
     if (event == BC_MODULE_RS485_EVENT_ASYNC_WRITE_DONE)
@@ -76,7 +83,7 @@ void application_init(void)
     // Init RS-485 Module
     bc_module_rs485_init();
     bc_module_rs485_set_event_handler(module_rs485_event_handler, NULL);
-    bc_module_rs485_set_update_interval(10000);
+    bc_module_rs485_set_update_interval(5000);
     bc_module_rs485_set_baudrate(BC_MODULE_RS485_BAUDRATE_9600);
     bc_module_rs485_set_async_fifo(&write_fifo, &read_fifo);
 
@@ -116,4 +123,5 @@ void application_task(void)
     // Plan next run this function after 1000 ms
     bc_scheduler_plan_current_from_now(500);
 }
+
 */
